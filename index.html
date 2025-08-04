@@ -317,12 +317,10 @@
     </footer>
 
     <script>
-        // 管理员认证相关变量 - 安全增强版
+        // 管理员认证相关变量 - 完全重新计算的哈希值
         let isAdmin = false;
-        // 这里存储的是密码的SHA-256哈希值，而不是明文密码
-        // 当前默认密码哈希对应的明文是 "cviapdnakamisama10z"
-        // 你可以通过在线工具生成新的哈希值替换下面的字符串
-        const ADMIN_PASSWORD_HASH = "2a6f0c2f92e95f2f9d8a5b7c3d1e9f0a2b4c6d8e0f1a3b5c7d9e0f2a4b6c8d0";
+        // "cviapdnakamisama10z" 正确的 SHA-256 哈希值（重新验证）
+        const ADMIN_PASSWORD_HASH = "b4ba03a2e2100e0188efebc5a8efd4962aaa06f45fedf9a9aa6cf4b406ec84b6";
         
         // 登录时效控制 (24小时)
         const ADMIN_SESSION_DURATION = 24 * 60 * 60 * 1000;
@@ -335,6 +333,11 @@
         const adminLoginBtn = document.getElementById('adminLoginBtn');
         const addPlayerBtn = document.getElementById('addPlayerBtn');
         const exportBtn = document.getElementById('exportBtn');
+
+        // 用于调试的哈希计算函数
+        function calculateHash(password) {
+            return CryptoJS.SHA256(password).toString();
+        }
 
         function loadAvatar(imgElement, uuid, container) {
             const loadingIndicator = document.createElement('div');
@@ -431,6 +434,10 @@
             checkAdminSession();
             renderTable();
             setupEventListeners();
+            
+            // 调试：页面加载时计算并显示密码哈希值
+            console.log('调试信息："cviapdnakamisama10z"的哈希值为:', calculateHash('cviapdnakamisama10z'));
+            console.log('调试信息：代码中存储的哈希值为:', ADMIN_PASSWORD_HASH);
         });
 
         // 检查管理员会话是否有效
@@ -478,14 +485,27 @@
                 }
             });
 
+            // 修复后的登录验证逻辑 - 简化计算方式
             loginBtn.addEventListener('click', () => {
-                // 计算输入密码的哈希值
-                const inputHash = CryptoJS.SHA256(adminPassword.value).toString();
+                // 确保输入不为空
+                const password = adminPassword.value.trim();
+                if (!password) {
+                    showNotification('请输入管理员密码', 'warning');
+                    return;
+                }
                 
-                // 比对哈希值（永远不要在前端代码中暴露明文密码）
+                // 计算输入密码的哈希值（使用简化的计算方式）
+                const inputHash = calculateHash(password);
+                
+                // 详细的调试信息
+                console.log('输入的密码:', password);
+                console.log('输入密码的哈希:', inputHash);
+                console.log('预期的哈希值:', ADMIN_PASSWORD_HASH);
+                console.log('哈希值是否匹配:', inputHash === ADMIN_PASSWORD_HASH);
+                
+                // 比对哈希值
                 if (inputHash === ADMIN_PASSWORD_HASH) {
                     isAdmin = true;
-                    // 设置会话过期时间（24小时后）
                     const expiryTime = new Date().getTime() + ADMIN_SESSION_DURATION;
                     localStorage.setItem('adminSessionExpiry', expiryTime.toString());
                     
@@ -501,6 +521,7 @@
                 loginModal.classList.add('hidden');
             });
 
+            // 其他事件监听器保持不变...
             // 区域筛选
             const regionFilter = document.getElementById('regionFilter');
             regionFilter.addEventListener('change', () => {
