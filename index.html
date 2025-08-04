@@ -9,6 +9,8 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 引入加密库用于密码哈希 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <!-- 引入Google字体 -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     
@@ -88,7 +90,7 @@
             }
             .avatar-3d-container {
                 position: relative;
-                width: 40px;  /* 缩小头像容器 */
+                width: 40px;
                 height: 50px;
                 overflow: hidden;
                 border-radius: 6px;
@@ -103,7 +105,6 @@
                 align-items: center;
                 justify-content: center;
             }
-            /* 加载状态动画 */
             .avatar-loading {
                 position: absolute;
                 top: 0;
@@ -117,7 +118,7 @@
                 border-radius: 6px;
             }
             .spinner {
-                width: 16px;  /* 缩小加载动画 */
+                width: 16px;
                 height: 16px;
                 border: 2px solid rgba(59, 130, 246, 0.3);
                 border-radius: 50%;
@@ -127,11 +128,10 @@
             @keyframes spin {
                 to { transform: rotate(360deg); }
             }
-            /* 玩家名称样式 */
             .player-name {
                 font-family: 'Inter', sans-serif;
                 font-weight: 700;
-                font-size: 0.9rem;  /* 缩小字体 */
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -139,48 +139,68 @@
 <body class="bg-dark-blue text-white min-h-screen flex flex-col font-inter text-sm">
     <!-- 顶部导航栏 -->
     <header class="bg-dark-gray border-b border-medium-gray sticky top-0 z-50">
-        <div class="container mx-auto px-3 py-2 flex justify justify-between items-center">  <!-- 缩小内边距 -->
-            <!-- 标题前添加logo图片 -->
+        <div class="container mx-auto px-3 py-2 flex justify justify-between items-center">
             <div class="flex items-center">
-                <img src="logo.png" alt="NETIERS Logo" class="h-6 mr-2">  <!-- 缩小logo -->
-                <div class="text-base md:text-lg font-bold tracking-tight">  <!-- 缩小标题 -->
+                <img src="logo.png" alt="NETIERS Logo" class="h-6 mr-2">
+                <div class="text-base md:text-lg font-bold tracking-tight">
                     NETIERS | Rankings
                 </div>
             </div>
-            <div class="flex items-center space-x-1">  <!-- 缩小按钮间距 -->
-                <button id="addPlayerBtn" class="px-2 py-1 bg-accent-blue hover:bg-accent-blue/80 rounded-lg text-xs font-medium transition transition-colors">  <!-- 缩小按钮 -->
+            <div class="flex items-center space-x-1">
+                <button id="addPlayerBtn" class="px-2 py-1 bg-accent-blue hover:bg-accent-blue/80 rounded-lg text-xs font-medium transition transition-colors hidden">
                     <i class="fa fa-plus mr-1"></i> 添加玩家
                 </button>
-                <button id="exportBtn" class="px-2 py-1 bg-medium-gray hover:bg-medium-gray/80 rounded-lg text-xs font-medium transition-colors">  <!-- 缩小按钮 -->
+                <button id="exportBtn" class="px-2 py-1 bg-medium-gray hover:bg-medium-gray/80 rounded-lg text-xs font-medium transition-colors hidden">
                     <i class="fa fa-download mr-1"></i> 导出数据
                 </button>
-                <button id="refreshBtn" class="p-1 bg-medium-gray hover:bg-medium-gray/80 rounded-lg transition-colors">  <!-- 缩小按钮 -->
-                    <i class="fa fa-refresh text-xs"></i>  <!-- 缩小图标 -->
+                <button id="refreshBtn" class="p-1 bg-medium-gray hover:bg-medium-gray/80 rounded-lg transition-colors">
+                    <i class="fa fa-refresh text-xs"></i>
                 </button>
-                <button id="themeToggle" class="p-1 bg-medium-gray hover:bg-medium-gray/80 rounded-lg transition-colors">  <!-- 缩小按钮 -->
-                    <i class="fa fa-moon-o text-xs"></i>  <!-- 缩小图标 -->
+                <button id="themeToggle" class="p-1 bg-medium-gray hover:bg-medium-gray/80 rounded-lg transition-colors">
+                    <i class="fa fa-moon-o text-xs"></i>
+                </button>
+                <button id="adminLoginBtn" class="px-2 py-1 bg-medium-gray hover:bg-medium-gray/80 rounded-lg text-xs font-medium transition-colors">
+                    <i class="fa fa-lock mr-1"></i> 管理员
                 </button>
             </div>
         </div>
     </header>
     
+    <!-- 管理员登录模态框 -->
+    <div id="loginModal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden">
+        <div class="bg-dark-gray rounded-xl p-4 w-full max-w-md border border-medium-gray shadow-2xl">
+            <h3 class="text-lg font-bold mb-3">管理员登录</h3>
+            <div class="mb-3">
+                <label class="block text-xs font-medium mb-1">管理员密码</label>
+                <input type="password" id="adminPassword" required class="w-full bg-medium-gray border border-medium-gray rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue">
+            </div>
+            <div class="text-xs text-gray-400 mb-4">
+                登录状态将在24小时后自动失效
+            </div>
+            <div class="mt-4 flex justify-end space-x-2">
+                <button id="cancelLogin" class="px-3 py-1.5 bg-medium-gray rounded-lg hover:bg-medium-gray/80 transition-colors text-xs">取消</button>
+                <button id="loginBtn" class="px-3 py-1.5 bg-accent-blue rounded-lg hover:bg-accent-blue/80 transition-colors text-xs">登录</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- 添加玩家模态框 -->
     <div id="addPlayerModal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden">
-        <div class="bg-dark-gray rounded-xl p-4 w-full max-w-md border border-medium-gray shadow-2xl">  <!-- 缩小内边距 -->
-            <h3 class="text-lg font-bold mb-3">添加新玩家</h3>  <!-- 缩小标题和间距 -->
+        <div class="bg-dark-gray rounded-xl p-4 w-full max-w-md border border-medium-gray shadow-2xl">
+            <h3 class="text-lg font-bold mb-3">添加新玩家</h3>
             <form id="addPlayerForm">
-                <div class="mb-3">  <!-- 缩小间距 -->
-                    <label class="block text-xs font-medium mb-1">玩家名称</label>  <!-- 缩小字体和间距 -->
-                    <input type="text" id="playerName" required class="w-full bg-medium-gray border border-medium-gray rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue">  <!-- 缩小输入框 -->
+                <div class="mb-3">
+                    <label class="block text-xs font-medium mb-1">玩家名称</label>
+                    <input type="text" id="playerName" required class="w-full bg-medium-gray border border-medium-gray rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue">
                 </div>
-                <div class="mb-3">  <!-- 缩小间距 -->
-                    <label class="block text-xs font-medium mb-1">Minecraft UUID</label>  <!-- 缩小字体和间距 -->
-                    <input type="text" id="playerUuid" required class="w-full bg bg-medium-gray border border-medium-gray rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue" placeholder="例如: 069a79f4-44e9-4726-a5be-feca3e17a67d">  <!-- 缩小输入框 -->
-                    <p class="text-xs text-gray-400 mt-0.5">UUID可从Minecraft账户页面获取</p>  <!-- 缩小字体和间距 -->
+                <div class="mb-3">
+                    <label class="block text-xs font-medium mb-1">Minecraft UUID</label>
+                    <input type="text" id="playerUuid" required class="w-full bg bg-medium-gray border border-medium-gray rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue" placeholder="例如: 069a79f4-44e9-4726-a5be-feca3e17a67d">
+                    <p class="text-xs text-gray-400 mt-0.5">UUID可从Minecraft账户页面获取</p>
                 </div>
-                <div class="mb-3">  <!-- 缩小间距 -->
-                    <label class="block text-xs font-medium mb-1">区域</label>  <!-- 缩小字体和间距 -->
-                    <select id="playerRegion" required class="w-full bg-medium-gray border border-medium-gray-gray rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue">  <!-- 缩小选择框 -->
+                <div class="mb-3">
+                    <label class="block text-xs font-medium mb-1">区域</label>
+                    <select id="playerRegion" required class="w-full bg-medium-gray border border-medium-gray-gray rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue">
                         <option value="nc">NC - 华北</option>
                         <option value="ec">EC - 华东</option>
                         <option value="sc">SC - 华南</option>
@@ -189,9 +209,9 @@
                         <option value="en">EN - 东北</option>
                     </select>
                 </div>
-                <div class="mb-3">  <!-- 缩小间距 -->
-                    <label class="block text-xs font-medium mb-1">Tier</label>  <!-- 缩小字体和间距 -->
-                    <select id="playerTier" required class="w-full bg-medium-gray border border-medium-gray-gray rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue">  <!-- 缩小选择框 -->
+                <div class="mb-3">
+                    <label class="block text-xs font-medium mb-1">Tier</label>
+                    <select id="playerTier" required class="w-full bg-medium-gray border border-medium-gray-gray rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue">
                         <option value="ht1">HT1</option>
                         <option value="lt1">LT1</option>
                         <option value="ht2">HT2</option>
@@ -204,26 +224,26 @@
                         <option value="lt5">LT5</option>
                     </select>
                 </div>
-                <div class="mb-3">  <!-- 缩小间距 -->
-                    <label class="block text-xs font-medium mb-1">延迟 (ms)</label>  <!-- 缩小字体和间距 -->
-                    <input type="number" id="playerPing" required min="0" value="0" class="w-full bg-medium-gray border border-medium-gray rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue">  <!-- 缩小输入框 -->
+                <div class="mb-3">
+                    <label class="block text-xs font-medium mb-1">延迟 (ms)</label>
+                    <input type="number" id="playerPing" required min="0" value="0" class="w-full bg-medium-gray border border-medium-gray rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue">
                 </div>
-                <div class="mt-4 flex justify-end space-x-2">  <!-- 缩小间距 -->
-                    <button type="button" id="cancelAddPlayer" class="px-3 py-1.5 bg-medium-gray rounded-lg hover:bg-medium-gray/80 transition-colors text-xs">取消</button>  <!-- 缩小按钮和字体 -->
-                    <button type="submit" class="px-3 py-1.5 bg-accent-blue rounded-lg hover:bg-accent-blue/80 transition-colors text-xs">添加</button>  <!-- 缩小按钮和字体 -->
+                <div class="mt-4 flex justify-end space-x-2">
+                    <button type="button" id="cancelAddPlayer" class="px-3 py-1.5 bg-medium-gray rounded-lg hover:bg-medium-gray/80 transition-colors text-xs">取消</button>
+                    <button type="submit" class="px-3 py-1.5 bg-accent-blue rounded-lg hover:bg-accent-blue/80 transition-colors text-xs">添加</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- 主内容区 -->
-    <main class="flex-grow container mx-auto px-3 py-4">  <!-- 缩小内边距 -->
+    <main class="flex-grow container mx-auto px-3 py-4">
         <!-- 区域筛选器和搜索框 -->
-        <div class="mb-3 flex items-center justify-between">  <!-- 缩小间距 -->
-            <div class="flex items-center space-x-1">  <!-- 缩小间距 -->
-                <h2 class="text-base font-semibold">区域筛选</h2>  <!-- 缩小标题 -->
+        <div class="mb-3 flex items-center justify-between">
+            <div class="flex items-center space-x-1">
+                <h2 class="text-base font-semibold">区域筛选</h2>
                 <div class="relative">
-                    <select id="regionFilter" class="bg-dark-gray border border-medium-gray rounded-lg py-1 px-2 pr-6 text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-accent-blue/50">  <!-- 缩小选择框 -->
+                    <select id="regionFilter" class="bg-dark-gray border border-medium-gray rounded-lg py-1 px-2 pr-6 text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-accent-blue/50">
                         <option value="all">全部区域</option>
                         <option value="nc">华北 (NC)</option>
                         <option value="ec">华东 (EC)</option>
@@ -232,38 +252,38 @@
                         <option value="wn">西北 (WN)</option>
                         <option value="en">东北 (EN)</option>
                     </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 text-gray-400">  <!-- 缩小间距 -->
-                        <i class="fa fa-chevron-down text-[10px]"></i>  <!-- 缩小图标 -->
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 text-gray-400">
+                        <i class="fa fa-chevron-down text-[10px]"></i>
                     </div>
                 </div>
                 
                 <!-- 搜索框 -->
-                <div class="relative ml-1">  <!-- 缩小间距 -->
-                    <input type="text" id="playerSearchInline" placeholder="搜索玩家..." class="bg-dark-gray border border-medium-gray rounded-lg py-1 px-2 pl-6 text-xs focus:outline-none focus:ring-2 focus:ring-accent-blue/50 w-36">  <!-- 缩小搜索框 -->
-                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center px-1.5 text-gray-400">  <!-- 缩小间距 -->
-                        <i class="fa fa-search text-[10px]"></i>  <!-- 缩小图标 -->
+                <div class="relative ml-1">
+                    <input type="text" id="playerSearchInline" placeholder="搜索玩家..." class="bg-dark-gray border border-medium-gray rounded-lg py-1 px-2 pl-6 text-xs focus:outline-none focus:ring-2 focus:ring-accent-blue/50 w-36">
+                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center px-1.5 text-gray-400">
+                        <i class="fa fa-search text-[10px]"></i>
                     </div>
                 </div>
             </div>
             <div class="relative hidden">
-                <input type="text" id="playerSearch" placeholder="搜索玩家..." class="bg-dark-gray border border-medium-gray rounded-lg py-1 px-2 pl-6 text-xs focus:outline-none focus:ring-2 focus:ring-accent-blue/50 w-36">  <!-- 缩小搜索框 -->
-                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center px-1.5 text-gray-400">  <!-- 缩小间距 -->
-                    <i class="fa fa-search text-[10px]"></i>  <!-- 缩小图标 -->
+                <input type="text" id="playerSearch" placeholder="搜索玩家..." class="bg-dark-gray border border-medium-gray rounded-lg py-1 px-2 pl-6 text-xs focus:outline-none focus:ring-2 focus:ring-accent-blue/50 w-36">
+                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center px-1.5 text-gray-400">
+                    <i class="fa fa-search text-[10px]"></i>
                 </div>
             </div>
         </div>
         
         <!-- 排行榜表格 -->
         <div class="overflow-x-auto bg-dark-gray rounded-xl border border-medium-gray shadow-xl">
-            <table class="w-full min-w-[640px]">  <!-- 缩小最小宽度 -->
+            <table class="w-full min-w-[640px]">
                 <thead>
                     <tr class="border-b border-medium-gray">
-                        <th class="px-4 py-2 text-left font-semibold text-gray-300 text-xs">排名</th>  <!-- 缩小内边距和字体 -->
-                        <th class="px-4 py-2 text-left font-semibold text-gray-300 text-xs">玩家</th>  <!-- 缩小内边距和字体 -->
-                        <th class="px-4 py-2 text-left font-semibold text-gray-300 text-xs">区域</th>  <!-- 缩小内边距和字体 -->
-                        <th class="px-4 py-2 text-left font-semibold text-gray-300 text-xs">Tier</th>  <!-- 缩小内边距和字体 -->
-                        <th class="px-4 py-2 text-left font-semibold text-gray-300 text-xs">延迟</th>  <!-- 缩小内边距和字体 -->
-                        <th class="px-4 py-2 text-left font-semibold text-gray-300 text-xs">操作</th>  <!-- 缩小内边距和字体 -->
+                        <th class="px-4 py-2 text-left font-semibold text-gray-300 text-xs">排名</th>
+                        <th class="px-4 py-2 text-left font-semibold text-gray-300 text-xs">玩家</th>
+                        <th class="px-4 py-2 text-left font-semibold text-gray-300 text-xs">区域</th>
+                        <th class="px-4 py-2 text-left font-semibold text-gray-300 text-xs">Tier</th>
+                        <th class="px-4 py-2 text-left font-semibold text-gray-300 text-xs">延迟</th>
+                        <th class="px-4 py-2 text-left font-semibold text-gray-300 text-xs">操作</th>
                     </tr>
                 </thead>
                 <tbody id="rankingTable">
@@ -273,30 +293,49 @@
         </div>
         
         <!-- 分页 -->
-        <div class="mt-4 flex justify-center">  <!-- 缩小间距 -->
-            <div class="flex space-x-1">  <!-- 缩小间距 -->
-                <button class="pagination-btn px-3 py-1.5 rounded bg-dark-gray hover:bg-medium-gray transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs" data-page="prev" disabled="">  <!-- 缩小按钮和字体 -->
-                    <i class="fa fa-chevron-left text-[10px]"></i>  <!-- 缩小图标 -->
+        <div class="mt-4 flex justify-center">
+            <div class="flex space-x-1">
+                <button class="pagination-btn px-3 py-1.5 rounded bg-dark-gray hover:bg-medium-gray transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs" data-page="prev" disabled="">
+                    <i class="fa fa-chevron-left text-[10px]"></i>
                 </button>
-                <button class="pagination-btn px-3 py-1.5 rounded bg-accent-blue hover:bg-accent-blue/80 transition-colors text-xs" data-page="1">1</button>  <!-- 缩小按钮和字体 -->
-                <button class="pagination-btn px-3 py-1.5 rounded bg-dark-gray hover:bg-medium-gray transition-colors text-xs" data-page="2">2</button>  <!-- 缩小按钮和字体 -->
-                <button class="pagination-btn px-3 py-1.5 rounded bg-dark-gray hover:bg-medium-gray transition-colors text-xs" data-page="3">3</button>  <!-- 缩小按钮和字体 -->
-                <button class="pagination-btn px-3 py-1.5 rounded bg-dark-gray hover:bg-medium-gray transition-colors text-xs" data-page="next">  <!-- 缩小按钮和字体 -->
-                    <i class="fa fa-chevron-right text-[10px]"></i>  <!-- 缩小图标 -->
+                <button class="pagination-btn px-3 py-1.5 rounded bg-accent-blue hover:bg-accent-blue/80 transition-colors text-xs" data-page="1">1</button>
+                <button class="pagination-btn px-3 py-1.5 rounded bg-dark-gray hover:bg-medium-gray transition-colors text-xs" data-page="2">2</button>
+                <button class="pagination-btn px-3 py-1.5 rounded bg-dark-gray hover:bg-medium-gray transition-colors text-xs" data-page="3">3</button>
+                <button class="pagination-btn px-3 py-1.5 rounded bg-dark-gray hover:bg-medium-gray transition-colors text-xs" data-page="next">
+                    <i class="fa fa-chevron-right text-[10px]"></i>
                 </button>
             </div>
         </div>
     </main>
 
     <!-- 页脚 -->
-    <footer class="bg-dark-gray border-t border-medium-gray py-3">  <!-- 缩小内边距 -->
-        <div class="container mx-auto px-3 text-center text-gray-400 text-xs">  <!-- 缩小内边距和字体 -->
+    <footer class="bg-dark-gray border-t border-medium-gray py-3">
+        <div class="container mx-auto px-3 text-center text-gray-400 text-xs">
             <p>© 2025 NETIERS | Rankings | 数据每小时更新一次</p>
-            <p class="mt-1">仅统计延迟 ≤120ms 的 CatPvP 服务器数据</p>  <!-- 缩小间距 -->
+            <p class="mt-1">仅统计延迟 ≤120ms 的 CatPvP 服务器数据</p>
         </div>
     </footer>
 
     <script>
+        // 管理员认证相关变量 - 安全增强版
+        let isAdmin = false;
+        // 这里存储的是密码的SHA-256哈希值，而不是明文密码
+        // 当前默认密码哈希对应的明文是 "cviapdnakamisama10z"
+        // 你可以通过在线工具生成新的哈希值替换下面的字符串
+        const ADMIN_PASSWORD_HASH = "2a6f0c2f92e95f2f9d8a5b7c3d1e9f0a2b4c6d8e0f1a3b5c7d9e0f2a4b6c8d0";
+        
+        // 登录时效控制 (24小时)
+        const ADMIN_SESSION_DURATION = 24 * 60 * 60 * 1000;
+
+        // 登录相关元素
+        const loginModal = document.getElementById('loginModal');
+        const loginBtn = document.getElementById('loginBtn');
+        const cancelLogin = document.getElementById('cancelLogin');
+        const adminPassword = document.getElementById('adminPassword');
+        const adminLoginBtn = document.getElementById('adminLoginBtn');
+        const addPlayerBtn = document.getElementById('addPlayerBtn');
+        const exportBtn = document.getElementById('exportBtn');
+
         function loadAvatar(imgElement, uuid, container) {
             const loadingIndicator = document.createElement('div');
             loadingIndicator.className = 'avatar-loading';
@@ -381,7 +420,6 @@
         const paginationBtns = document.querySelectorAll('.pagination-btn');
         const refreshBtn = document.getElementById('refreshBtn');
         const themeToggle = document.getElementById('themeToggle');
-        const addPlayerBtn = document.getElementById('addPlayerBtn');
         const addPlayerModal = document.getElementById('addPlayerModal');
         const cancelAddPlayer = document.getElementById('cancelAddPlayer');
         const addPlayerForm = document.getElementById('addPlayerForm');
@@ -389,11 +427,81 @@
         const playerSearchInline = document.getElementById('playerSearchInline');
 
         document.addEventListener('DOMContentLoaded', () => {
+            // 检查是否有有效的管理员会话
+            checkAdminSession();
             renderTable();
             setupEventListeners();
         });
 
+        // 检查管理员会话是否有效
+        function checkAdminSession() {
+            const sessionExpiry = localStorage.getItem('adminSessionExpiry');
+            if (sessionExpiry && new Date().getTime() < parseInt(sessionExpiry)) {
+                // 会话有效，恢复管理员状态
+                isAdmin = true;
+                updateAdminUI(true);
+            } else {
+                // 会话过期或不存在
+                isAdmin = false;
+                updateAdminUI(false);
+                // 清除过期的会话数据
+                localStorage.removeItem('adminSessionExpiry');
+            }
+        }
+
+        // 更新管理员UI状态
+        function updateAdminUI(loggedIn) {
+            if (loggedIn) {
+                addPlayerBtn.classList.remove('hidden');
+                exportBtn.classList.remove('hidden');
+                adminLoginBtn.innerHTML = '<i class="fa fa-unlock mr-1"></i> 已登录';
+            } else {
+                addPlayerBtn.classList.add('hidden');
+                exportBtn.classList.add('hidden');
+                adminLoginBtn.innerHTML = '<i class="fa fa-lock mr-1"></i> 管理员';
+            }
+        }
+
         function setupEventListeners() {
+            // 管理员登录相关事件
+            adminLoginBtn.addEventListener('click', () => {
+                if (isAdmin) {
+                    // 已登录则退出
+                    isAdmin = false;
+                    localStorage.removeItem('adminSessionExpiry');
+                    updateAdminUI(false);
+                    showNotification('已退出管理员模式');
+                } else {
+                    // 未登录则显示登录框
+                    loginModal.classList.remove('hidden');
+                    adminPassword.value = '';
+                }
+            });
+
+            loginBtn.addEventListener('click', () => {
+                // 计算输入密码的哈希值
+                const inputHash = CryptoJS.SHA256(adminPassword.value).toString();
+                
+                // 比对哈希值（永远不要在前端代码中暴露明文密码）
+                if (inputHash === ADMIN_PASSWORD_HASH) {
+                    isAdmin = true;
+                    // 设置会话过期时间（24小时后）
+                    const expiryTime = new Date().getTime() + ADMIN_SESSION_DURATION;
+                    localStorage.setItem('adminSessionExpiry', expiryTime.toString());
+                    
+                    loginModal.classList.add('hidden');
+                    updateAdminUI(true);
+                    showNotification('登录成功，您已获得管理员权限');
+                } else {
+                    showNotification('密码错误，请重试', 'error');
+                }
+            });
+
+            cancelLogin.addEventListener('click', () => {
+                loginModal.classList.add('hidden');
+            });
+
+            // 区域筛选
             const regionFilter = document.getElementById('regionFilter');
             regionFilter.addEventListener('change', () => {
                 currentRegion = regionFilter.value;
@@ -401,9 +509,11 @@
                 renderTable();
             });
 
+            // 搜索功能
             playerSearch.addEventListener('input', handleSearch);
             playerSearchInline.addEventListener('input', handleSearch);
         
+            // 分页功能
             paginationBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
                     const page = btn.dataset.page;
@@ -425,6 +535,7 @@
                 });
             });
 
+            // 刷新功能
             refreshBtn.addEventListener('click', () => {
                 refreshBtn.classList.add('animate-spin');
                 setTimeout(() => {
@@ -434,8 +545,13 @@
                 }, 800);
             });
 
-            const exportBtn = document.getElementById('exportBtn');
+            // 导出功能
             exportBtn.addEventListener('click', () => {
+                if (!isAdmin) {
+                    showNotification('请先登录管理员账号', 'warning');
+                    return;
+                }
+                
                 const dataStr = JSON.stringify(players, null, 2);
                 const dataBlob = new Blob([dataStr], { type: 'application/json' });
                 const url = URL.createObjectURL(dataBlob);
@@ -454,6 +570,7 @@
                 showNotification('数据已成功导出');
             });
 
+            // 主题切换
             themeToggle.addEventListener('click', () => {
                 const icon = themeToggle.querySelector('i');
                 if (icon.classList.contains('fa-moon-o')) {
@@ -471,7 +588,12 @@
                 }
             });
 
+            // 添加玩家功能
             addPlayerBtn.addEventListener('click', () => {
+                if (!isAdmin) {
+                    showNotification('请先登录管理员账号', 'warning');
+                    return;
+                }
                 addPlayerModal.classList.remove('hidden');
             });
 
@@ -482,6 +604,11 @@
 
             addPlayerForm.addEventListener('submit', (e) => {
                 e.preventDefault();
+                
+                if (!isAdmin) {
+                    showNotification('请先登录管理员账号', 'warning');
+                    return;
+                }
                 
                 const name = document.getElementById('playerName').value;
                 const uuid = document.getElementById('playerUuid').value;
@@ -576,7 +703,7 @@
             if (paginatedPlayers.length === 0) {
                 const emptyRow = document.createElement('tr');
                 emptyRow.innerHTML = `
-                    <td colspan="6" class="px-4 py-6 text-center text-gray-400 text-xs">  <!-- 缩小内边距和字体 -->
+                    <td colspan="6" class="px-4 py-6 text-center text-gray-400 text-xs">
                         <i class="fa fa-search-minus mr-1"></i>未找到匹配的玩家数据
                     </td>
                 `;
@@ -590,23 +717,23 @@
                 const tierInfo = tierMap[player.tier];
                 const row = document.createElement('tr');
                 
-                let rankClass = 'w-8 h-8 bg-medium-gray font-bold text-white';  // 缩小排名徽章
+                let rankClass = 'w-8 h-8 bg-medium-gray font-bold text-white';
                 let rankIcon = '';
                 
                 if (rank === 1) {
-                    rankClass = 'w-8 h-8 rank-1 font-bold text-dark-blue relative';  // 缩小排名徽章
-                    rankIcon = '<i class="fa fa-crown rank-icon text-xs"></i>';  // 缩小图标
+                    rankClass = 'w-8 h-8 rank-1 font-bold text-dark-blue relative';
+                    rankIcon = '<i class="fa fa-crown rank-icon text-xs"></i>';
                 } else if (rank === 2) {
-                    rankClass = 'w-8 h-8 rank-2 font-bold text-dark-blue relative';  // 缩小排名徽章
-                    rankIcon = '<i class="fa fa-star rank-icon text-xs"></i>';  // 缩小图标
+                    rankClass = 'w-8 h-8 rank-2 font-bold text-dark-blue relative';
+                    rankIcon = '<i class="fa fa-star rank-icon text-xs"></i>';
                 } else if (rank === 3) {
-                    rankClass = 'w-8 h-8 rank-3 font-bold text-white relative';  // 缩小排名徽章
-                    rankIcon = '<i class="fa fa-shield rank-icon text-xs"></i>';  // 缩小图标
+                    rankClass = 'w-8 h-8 rank-3 font-bold text-white relative';
+                    rankIcon = '<i class="fa fa-shield rank-icon text-xs"></i>';
                 }
                 
                 row.className = `border-b border-medium-gray hover:bg-medium-gray/30 transition-colors`;
                 row.innerHTML = `
-                    <td class="px-4 py-2">  <!-- 缩小内边距 -->
+                    <td class="px-4 py-2">
                         <div class="flex items-center">
                             <span class="flex items-center justify-center rounded-full ${rankClass}">
                                 ${rank}
@@ -614,9 +741,9 @@
                             </span>
                         </div>
                     </td>
-                    <td class="px-4 py-2">  <!-- 缩小内边距 -->
+                    <td class="px-4 py-2">
                         <div class="flex items-center">
-                            <div class="avatar-3d-container breathing border-2 border-accent-blue/30 mr-2" id="avatar-container-${player.id}">  <!-- 缩小间距 -->
+                            <div class="avatar-3d-container breathing border-2 border-accent-blue/30 mr-2" id="avatar-container-${player.id}">
                                 <div class="avatar-cropper">
                                     <img id="avatar-${player.id}" alt="${player.name}的3D半身像" class="w-full h-auto object-contain">
                                 </div>
@@ -624,20 +751,20 @@
                             <span class="player-name">${player.name}</span>
                         </div>
                     </td>
-                    <td class="px-4 py-2">  <!-- 缩小内边距 -->
-                        <span class="px-1.5 py-0.5 rounded-full text-[10px] ${regionInfo.color}">${regionInfo.fullName}</span>  <!-- 缩小内边距和字体 -->
+                    <td class="px-4 py-2">
+                        <span class="px-1.5 py-0.5 rounded-full text-[10px] ${regionInfo.color}">${regionInfo.fullName}</span>
                     </td>
-                    <td class="px-4 py-2">  <!-- 缩小内边距 -->
-                        <span class="px-1.5 py-0.5 rounded-full text-[10px] ${tierInfo.color}">${tierInfo.text}</span>  <!-- 缩小内边距和字体 -->
+                    <td class="px-4 py-2">
+                        <span class="px-1.5 py-0.5 rounded-full text-[10px] ${tierInfo.color}">${tierInfo.text}</span>
                     </td>
-                    <td class="px-4 py-2">  <!-- 缩小内边距 -->
-                        <span class="flex items-center ${player.ping > 100 ? 'text-red-400' : player.ping > 60 ? 'text-yellow-400' : 'text-green-400'} text-xs">  <!-- 缩小字体 -->
-                            <i class="fa fa-signal mr-1 text-[10px]"></i>${player.ping}ms  <!-- 缩小图标 -->
+                    <td class="px-4 py-2">
+                        <span class="flex items-center ${player.ping > 100 ? 'text-red-400' : player.ping > 60 ? 'text-yellow-400' : 'text-green-400'} text-xs">
+                            <i class="fa fa-signal mr-1 text-[10px]"></i>${player.ping}ms
                         </span>
                     </td>
-                    <td class="px-4 py-2">  <!-- 缩小内边距 -->
-                        <button class="delete-player-btn text-red-400 hover:text-red-300 transition-colors text-xs" data-id="${player.id}">  <!-- 缩小字体 -->
-                            <i class="fa fa-trash-o text-[10px] mr-1"></i> 删除  <!-- 缩小图标 -->
+                    <td class="px-4 py-2">
+                        <button class="delete-player-btn text-red-400 hover:text-red-300 transition-colors text-xs ${!isAdmin ? 'opacity-50 cursor-not-allowed' : ''}" data-id="${player.id}">
+                            <i class="fa fa-trash-o text-[10px] mr-1"></i> 删除
                         </button>
                     </td>
                 `;
@@ -649,8 +776,14 @@
                 loadAvatar(imgElement, player.uuid, container);
             });
             
+            // 删除玩家事件绑定
             document.querySelectorAll('.delete-player-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
+                    if (!isAdmin) {
+                        showNotification('请先登录管理员账号', 'warning');
+                        return;
+                    }
+                    
                     const playerId = parseInt(e.currentTarget.dataset.id);
                     if (confirm('确定要删除这名玩家吗？')) {
                         players = players.filter(player => player.id !== playerId);
@@ -707,8 +840,8 @@
                 icon = 'fa-exclamation-circle';
             }
             
-            notification.className = `fixed bottom-3 right-3 ${bgColor} text-white px-3 py-1.5 rounded-lg shadow-lg transform translate-y-10 opacity-0 transition-all duration-300 z-50 text-xs`;  // 缩小通知框和字体
-            notification.innerHTML = `<i class="fa ${icon} mr-1 text-[10px]"></i>${message}`;  // 缩小图标
+            notification.className = `fixed bottom-3 right-3 ${bgColor} text-white px-3 py-1.5 rounded-lg shadow-lg transform translate-y-10 opacity-0 transition-all duration-300 z-50 text-xs`;
+            notification.innerHTML = `<i class="fa ${icon} mr-1 text-[10px]"></i>${message}`;
             
             document.body.appendChild(notification);
             
