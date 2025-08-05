@@ -54,6 +54,14 @@ const players = [
     "region": "en",
     "tier": "lt5",
     "ping": 106
+  },
+  {
+    "id": 8,
+    "name": " BloozingXD",
+    "uuid": "a86e09e0e23b419292ebce363fd160db",
+    "region": "ec",
+    "tier": "lt3",
+    "ping": 102
   }
 ];
 
