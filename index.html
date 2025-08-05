@@ -4,15 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NETIERS | Rankings</title>
-    
-    <!-- 网站图标 -->
+
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     
-    <!-- 配置Tailwind自定义颜色和字体 -->
+  
     <script>
         tailwind.config = {
             theme: {
@@ -135,7 +134,7 @@
     </style>
 </head>
 <body class="bg-dark-blue text-white min-h-screen flex flex-col font-inter text-sm">
-    <!-- 顶部导航栏 -->
+
     <header class="bg-dark-gray border-b border-medium-gray sticky top-0 z-50">
         <div class="container mx-auto px-3 py-2 flex justify justify-between items-center">
             <div class="flex items-center">
@@ -155,9 +154,9 @@
         </div>
     </header>
     
-    <!-- 主内容区 -->
+  
     <main class="flex-grow container mx-auto px-3 py-4">
-        <!-- 区域筛选器和搜索框 -->
+   
         <div class="mb-3 flex items-center justify-between">
             <div class="flex items-center space-x-1">
                 <h2 class="text-base font-semibold">区域筛选</h2>
@@ -176,7 +175,7 @@
                     </div>
                 </div>
                 
-                <!-- 搜索框 -->
+ 
                 <div class="relative ml-1">
                     <input type="text" id="playerSearchInline" placeholder="搜索玩家..." class="bg-dark-gray border border-medium-gray rounded-lg py-1 px-2 pl-6 text-xs focus:outline-none focus:ring-2 focus:ring-accent-blue/50 w-36">
                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center px-1.5 text-gray-400">
@@ -192,7 +191,7 @@
             </div>
         </div>
         
-        <!-- 排行榜表格 -->
+
         <div class="overflow-x-auto bg-dark-gray rounded-xl border border-medium-gray shadow-xl">
             <table class="w-full min-w-[640px]">
                 <thead>
@@ -205,7 +204,7 @@
                     </tr>
                 </thead>
                 <tbody id="rankingTable">
-                    <!-- 表格内容将通过JavaScript动态生成 -->
+   
                 </tbody>
             </table>
         </div>
@@ -226,7 +225,7 @@
         </div>
     </main>
 
-    <!-- 页脚 -->
+
     <footer class="bg-dark-gray border-t border-medium-gray py-3">
         <div class="container mx-auto px-3 text-center text-gray-400 text-xs">
             <p>© 2025 NETIERS | Rankings | 数据每小时更新一次</p>
@@ -234,7 +233,7 @@
         </div>
     </footer>
 
-    <!-- 引入数据和脚本 -->
+ 
     <script src="player-data.js"></script>
     <script src="rankings-script.js"></script>
 </body>
