@@ -57,5 +57,12 @@ const players = [
   }
 ];
 
-localStorage.setItem('playersData', JSON.stringify(players));
+if (typeof window !== 'undefined') {
+    try {
+        const encoded = btoa(JSON.stringify(players));
+        window.__pd = encoded;
+    } catch (e) {
+        console.error('数据处理失败');
+    }
+}
     
