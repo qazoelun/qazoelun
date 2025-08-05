@@ -46,6 +46,14 @@ const players = [
     "region": "en",
     "tier": "lt3",
     "ping": 81
+  },
+  {
+    "id": 7,
+    "name": " mojo_xiaoyun",
+    "uuid": "031aa24859514a77b8b5c58e9df652a0",
+    "region": "en",
+    "tier": "lt5",
+    "ping": 85
   }
 ];
 
