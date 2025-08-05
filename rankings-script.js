@@ -1,4 +1,4 @@
-// 配置映射表
+
 const tierConfig = {
     'ht1': { color: 'bg-gold/20 text-gold font-bold tier-ht1', text: 'HT1' },
     'lt1': { color: 'bg-gold/20 text-gold font-bold', text: 'LT1' },
@@ -21,13 +21,13 @@ const regionConfig = {
     'en': { fullName: '东北', color: 'bg-green-500/20 text-green-400' }
 };
 
-// 状态变量
+
 let currentRegion = 'all';
 let currentPage = 1;
 let searchQuery = '';
 const itemsPerPage = 10;
 
-// DOM元素
+
 const rankingTable = document.getElementById('rankingTable');
 const paginationButtons = document.querySelectorAll('.pagination-btn');
 const refreshButton = document.getElementById('refreshBtn');
@@ -36,26 +36,25 @@ const playerSearch = document.getElementById('playerSearch');
 const playerSearchInline = document.getElementById('playerSearchInline');
 const regionFilter = document.getElementById('regionFilter');
 
-// 初始化
+
 document.addEventListener('DOMContentLoaded', function() {
     renderTable();
     attachEventListeners();
 });
 
-// 事件监听
 function attachEventListeners() {
-    // 区域筛选
+
     regionFilter.addEventListener('change', function() {
         currentRegion = this.value;
         currentPage = 1;
         renderTable();
     });
 
-    // 搜索功能
+    
     playerSearch.addEventListener('input', handleSearch);
     playerSearchInline.addEventListener('input', handleSearch);
 
-    // 分页功能
+
     paginationButtons.forEach(button => {
         button.addEventListener('click', function() {
             const page = this.dataset.page;
@@ -77,7 +76,6 @@ function attachEventListeners() {
         });
     });
 
-    // 刷新按钮
     refreshButton.addEventListener('click', function() {
         this.classList.add('animate-spin');
         setTimeout(() => {
@@ -87,7 +85,6 @@ function attachEventListeners() {
         }, 800);
     });
 
-    // 主题切换
     themeToggle.addEventListener('click', function() {
         const icon = this.querySelector('i');
         if (icon.classList.contains('fa-moon-o')) {
@@ -106,7 +103,6 @@ function attachEventListeners() {
     });
 }
 
-// 搜索处理
 function handleSearch(e) {
     if (e.target.id === 'playerSearch') {
         playerSearchInline.value = e.target.value;
@@ -119,7 +115,6 @@ function handleSearch(e) {
     renderTable();
 }
 
-// 获取筛选后的玩家
 function getFilteredPlayers() {
     let result = [...players];
     
@@ -131,7 +126,6 @@ function getFilteredPlayers() {
         result = result.filter(p => p.name.toLowerCase().includes(searchQuery));
     }
     
-    // 排序逻辑
     result.sort((a, b) => {
         const tierOrder = {
             'ht1': 10, 'lt1': 9, 'ht2': 8, 'lt2': 7,
@@ -146,7 +140,6 @@ function getFilteredPlayers() {
     return result;
 }
 
-// 加载头像
 function loadAvatar(img, uuid, container) {
     const loader = document.createElement('div');
     loader.className = 'avatar-loading';
@@ -186,7 +179,6 @@ function loadAvatar(img, uuid, container) {
     tryNextUrl();
 }
 
-// 渲染表格
 function renderTable() {
     const filtered = getFilteredPlayers();
     const totalPages = Math.ceil(filtered.length / itemsPerPage);
@@ -260,8 +252,7 @@ function renderTable() {
         `;
         
         rankingTable.appendChild(row);
-        
-        // 加载头像
+
         const img = document.getElementById(`avatar-${player.id}`);
         const container = document.getElementById(`avatar-container-${player.id}`);
         loadAvatar(img, player.uuid, container);
@@ -270,7 +261,6 @@ function renderTable() {
     updatePagination();
 }
 
-// 更新分页按钮状态
 function updatePagination() {
     const filtered = getFilteredPlayers();
     const totalPages = Math.ceil(filtered.length / itemsPerPage);
@@ -297,7 +287,6 @@ function updatePagination() {
     });
 }
 
-// 显示消息提示
 function showMessage(msg, type = 'info') {
     const notification = document.createElement('div');
     let bgClass = 'bg-dark-gray';
