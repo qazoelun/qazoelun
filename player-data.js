@@ -69,7 +69,7 @@ const players = [
     "uuid": "d372e8d7e7e04c6c889b0078e19a0627",
     "region": "ws",
     "tier": "lt5",
-    "ping": 102
+    "ping": 82
   }
 ];
 
