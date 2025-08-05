@@ -30,7 +30,7 @@ const players = [
     "uuid": "9df71575-b9a1-4c24-a9a2-8544d158d999",
     "region": "wn",
     "tier": "ht3",
-    "ping": 74
+    "ping": 95
   },
   {
     "id": 5,
