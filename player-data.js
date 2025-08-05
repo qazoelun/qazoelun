@@ -52,7 +52,7 @@ const players = [
     "name": " mojo_xiaoyun",
     "uuid": "031aa24859514a77b8b5c58e9df652a0",
     "region": "en",
-    "tier": "lt5",
+    "tier": "ht5",
     "ping": 106
   },
   {
