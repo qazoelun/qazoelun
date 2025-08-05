@@ -39,6 +39,14 @@ const players = [
     "region": "nc",
     "tier": "ht3",
     "ping": 65
+  },
+{
+    "id": 6,
+    "name": " _just_raining_",
+    "uuid": "2140249d84674ebfb2317df94be844c5",
+    "region": "en",
+    "tier": "lt3",
+    "ping": 81
   }
 ];
 
