@@ -49,6 +49,5 @@ const players = [
   }
 ];
 
-// 保存到本地存储
 localStorage.setItem('playersData', JSON.stringify(players));
     
