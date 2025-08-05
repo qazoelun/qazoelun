@@ -62,6 +62,14 @@ const players = [
     "region": "ec",
     "tier": "lt3",
     "ping": 102
+  },
+  {
+    "id": 9,
+    "name": " Khp3r1",
+    "uuid": "d372e8d7e7e04c6c889b0078e19a0627",
+    "region": "ws",
+    "tier": "lt5",
+    "ping": 102
   }
 ];
 
