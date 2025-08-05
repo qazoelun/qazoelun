@@ -10,8 +10,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    
-  
     <script>
         tailwind.config = {
             theme: {
@@ -134,7 +132,6 @@
     </style>
 </head>
 <body class="bg-dark-blue text-white min-h-screen flex flex-col font-inter text-sm">
-
     <header class="bg-dark-gray border-b border-medium-gray sticky top-0 z-50">
         <div class="container mx-auto px-3 py-2 flex justify justify-between items-center">
             <div class="flex items-center">
@@ -153,10 +150,7 @@
             </div>
         </div>
     </header>
-    
-  
     <main class="flex-grow container mx-auto px-3 py-4">
-   
         <div class="mb-3 flex items-center justify-between">
             <div class="flex items-center space-x-1">
                 <h2 class="text-base font-semibold">区域筛选</h2>
@@ -174,8 +168,6 @@
                         <i class="fa fa-chevron-down text-[10px]"></i>
                     </div>
                 </div>
-                
- 
                 <div class="relative ml-1">
                     <input type="text" id="playerSearchInline" placeholder="搜索玩家..." class="bg-dark-gray border border-medium-gray rounded-lg py-1 px-2 pl-6 text-xs focus:outline-none focus:ring-2 focus:ring-accent-blue/50 w-36">
                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center px-1.5 text-gray-400">
@@ -190,8 +182,6 @@
                 </div>
             </div>
         </div>
-        
-
         <div class="overflow-x-auto bg-dark-gray rounded-xl border border-medium-gray shadow-xl">
             <table class="w-full min-w-[640px]">
                 <thead>
@@ -204,12 +194,9 @@
                     </tr>
                 </thead>
                 <tbody id="rankingTable">
-   
                 </tbody>
             </table>
         </div>
-        
-
         <div class="mt-4 flex justify-center">
             <div class="flex space-x-1">
                 <button class="pagination-btn px-3 py-1.5 rounded bg-dark-gray hover:bg-medium-gray transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs" data-page="prev" disabled="">
@@ -224,16 +211,12 @@
             </div>
         </div>
     </main>
-
-
     <footer class="bg-dark-gray border-t border-medium-gray py-3">
         <div class="container mx-auto px-3 text-center text-gray-400 text-xs">
             <p>© 2025 NETIERS | Rankings | 数据每小时更新一次</p>
             <p class="mt-1">仅统计延迟 ≤120ms 的 CatPvP 服务器数据</p>
         </div>
     </footer>
-
- 
     <script src="player-data.js"></script>
     <script src="rankings-script.js"></script>
 </body>
