@@ -70,6 +70,14 @@ const players = [
     "region": "ws",
     "tier": "lt5",
     "ping": 82
+  },
+  {
+    "id": 10,
+    "name": " bai_ye_c",
+    "uuid": "7b8e9f1058c548f0bcf0f4074fbe8585",
+    "region": "sc",
+    "tier": "lt4",
+    "ping": 74
   }
 ];
 
